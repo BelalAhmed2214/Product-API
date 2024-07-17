@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Product;
@@ -8,10 +7,13 @@ use App\Http\Requests\Api\V1\UpdateProductRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use App\Http\Resources\Api\V1\ProductResource;
+use App\Http\Resources\Api\V1\SpecificProductResource;
+
 use Illuminate\Http\Request;
 use App\Services\V1\ProductService;
 use App\Filters\V1\ProductFilter;
 use Exception;
+
 
 class ProductController extends Controller
 {
@@ -23,7 +25,22 @@ class ProductController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/products",
+     *     tags={"products"},
+     *     summary="Get list of products",
+     *     description="Returns a list of products",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="successful operation",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Product"))
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No products found"
+     *     )
+     * )
      */
     public function index(Request $request)
     {
@@ -37,7 +54,30 @@ class ProductController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/products",
+     *     tags={"products"},
+     *     summary="Create a new product",
+     *     description="Creates a new product",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/StoreProductRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Product created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Product creation failed"
+     *     )
+     * )
      */
     public function store(StoreProductRequest $request)
     {
@@ -59,15 +99,66 @@ class ProductController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/products/{id}",
+     *     tags={"products"},
+     *     summary="Get a product by ID",
+     *     description="Returns a single product",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found"
+     *     )
+     * )
      */
-    public function show(Product $product)
-    {
-        return new ProductResource($product);
+    public function show(Product $product){
+        return response()->json([
+            'Product' => new SpecificProductResource($product)
+        ], Response::HTTP_OK);    
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/products/{id}",
+     *     tags={"products"},
+     *     summary="Update an existing product",
+     *     description="Updates a product by ID",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/UpdateProductRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Product update failed"
+     *     )
+     * )
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
@@ -96,7 +187,27 @@ class ProductController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/products/{id}",
+     *     tags={"products"},
+     *     summary="Delete a product",
+     *     description="Deletes a product by ID",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product deleted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Product deletion failed"
+     *     )
+     * )
      */
     public function destroy(Product $product)
     {

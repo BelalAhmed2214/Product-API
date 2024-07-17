@@ -3,7 +3,31 @@
 namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
-
+/**
+ * @OA\Schema(
+ *     schema="UpdateProductRequest",
+ *     type="object",
+ *     title="UpdateProductRequest",
+ *     description="Update Product Request",
+ *     required={"name", "description", "price"},
+ *     @OA\Property(
+ *         property="name",
+ *         type="string",
+ *         description="Name of the product"
+ *     ),
+ *     @OA\Property(
+ *         property="description",
+ *         type="string",
+ *         description="Description of the product"
+ *     ),
+ *     @OA\Property(
+ *         property="price",
+ *         type="number",
+ *         format="float",
+ *         description="Price of the product"
+ *     )
+ * )
+ */
 class UpdateProductRequest extends FormRequest
 {
     /**
